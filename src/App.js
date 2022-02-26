@@ -37,14 +37,71 @@ const initialFormErrors = {
 const initialPizza = []
 const initialDisabled = false
 
-
-
-
 const App = () => {
+
+  const [pizzas, setPizza] = useState(initialPizza)
+  const [formValues, setFormValues] = useState(initialFormValues)
+  const [formErrors, setFormErrors] = useState(initialFormErrors)
+  const [disabled, setDisabled] = useState(initialDisabled)
+
+  const postPizza = newPizza => {
+    axios.post('https://reqres.in/api/orders', newPizza)
+    .then(resp => {
+      setPizza([resp.data, ...pizzas])
+    }).catch(error => console.log(error))
+    .finally(() => setFormValues(initialFormValues))
+  } 
+
+  const validate = (name, value) => {
+    yup.reach(schema, name)
+    .validate(value)
+    .then(() => setFormErrors({...formErrors, [name]: ''}))
+    .catch(error => setFormErrors({...formErrors, [name]: error.errors[0]}))
+  }
+
+  const inputChange = (name, value) => {
+    validate(name, value);
+    setFormValues({
+      ...formValues,
+      [name]: value
+    })
+  }
+
+  const formSubmit = () => {
+    const newPizza = {
+      name: formValues.name.trim(),
+      extras: formValues.extras.trim(),
+      sauce: formValues.sauce.trim(),
+      size: formValues.size.trim(),
+      toppings:['cheese', 'pepperoni', 'sausage', 'onion', 'pineapple', 'greenPepper', 'brussel sprouts'].filter(topping => !!formValues[topping])
+    }
+    postPizza(newPizza)
+  }
+
+  useEffect(() => {
+    schema.isValid(formValues).then(valid => setDisabled(!valid))
+  }, [formValues])
+
   return (
     <>
-      <h1>Lambda Eats</h1>
-      <p>You can remove this code and create your own header</p>
+      <header>
+        <NavBar />
+      </header>
+      <Switch>
+        <Route path='/Pizza'>
+          <PizzaForm
+          values={formValues}
+          change={inputChange}
+          submit={formSubmit}
+          disabled={disabled}
+          errors={formErrors}
+          />
+
+        </Route>
+        <Route path='/'>
+          <Home />
+        </Route>
+      </Switch>
     </>
   );
 };
