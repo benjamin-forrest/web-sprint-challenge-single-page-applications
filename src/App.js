@@ -73,7 +73,7 @@ const App = () => {
       extras: formValues.extras.trim(),
       sauce: formValues.sauce.trim(),
       size: formValues.size.trim(),
-      toppings:['cheese', 'pepperoni', 'sausage', 'onion', 'pineapple', 'greenPepper', 'brussel sprouts'].filter(topping => !!formValues[topping])
+      toppings:['cheese', 'pepperoni', 'sausage', 'onion', 'pineapple', 'greenPepper', 'brusselSprouts'].filter(topping => !!formValues[topping])
     }
     postPizza(newPizza)
   }
